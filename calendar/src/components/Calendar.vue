@@ -96,6 +96,9 @@ export default {
 };
 </script>
 <style scoped>
+div{
+    font-family: 'Microsoft YaHei';
+}
 ul,
 li {
   padding: 0;
@@ -167,6 +170,8 @@ li {
   text-align: center;
   margin: 0px auto;
   width: 980px;
+  font-size: 26px;
+  color:#A6A6A6;
 }
 .calendar-view {
   border-top: 1px #d1d1d1 solid;
@@ -185,6 +190,7 @@ li.top-li {
   height: 39px;
   line-height: 39px;
   background-color: #eaeaea;
+  color:#2B2B2B;
 }
 li.left-li {
   width: 138px;
@@ -193,26 +199,23 @@ li.left-li {
 .other-day {
   background: linear-gradient(
     45deg,
-    #eaeaea 25%,
+    #F0F0F0 25%,
     #f7f7f7 0,
     #f7f7f7 50%,
-    #eaeaea 0,
-    #eaeaea 75%,
+    #F0F0F0 0,
+    #F0F0F0 75%,
     #f7f7f7 0
   );
   background-size: 30px 30px;
 }
 .current-day {
   background-color: #fdf5e6;
+  font-weight: bold;
+  color:#2B2B2B;
 }
 .day {
-  background-color: #fffafa;
-}
-.workday {
-  width: 30px;
-  height: 30px;
-  color: red;
-  line-height: 30px;
+  background-color: #f7f7f7;
+  color:#666666;
 }
 .workday {
   width: 30px;
@@ -220,6 +223,8 @@ li.left-li {
   color: red;
   line-height: 30px;
   position: absolute;
+  font-weight:bold; 
+  font-size: 18px;
 }
 .holiday {
   width: 30px;
@@ -227,5 +232,7 @@ li.left-li {
   color: green;
   line-height: 30px;
   position: absolute;
+  font-weight:bold; 
+  font-size: 18px;
 }
 </style>
