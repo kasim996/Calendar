@@ -24,6 +24,8 @@
           <div>
             <div class="holiday" v-if="item.holiday !== null && item.holiday.holiday">休</div>
             <div class="workday" v-if="item.holiday !== null && !item.holiday.holiday">班</div>
+            <div class="task-view task-low-urgent" v-if="item.holiday !== null && item.holiday.holiday"></div>
+            <!-- <div :class="item.select?'select':''">{{item.date}}</div> -->
             {{item.date}}
           </div>
         </li>
@@ -64,8 +66,13 @@ export default {
           className += "other-day ";
         } else if (ymd.toString() === v.toString()) {
           className += "current-day ";
+          v.select = true;
+        } else if (ymd.date < v.date) {
+          className += "afterday ";
+          v.select = false;
         } else {
           className += "day ";
+          v.select = false;
         }
         v.className = className;
         dates += v.toString() + ",";
@@ -96,8 +103,8 @@ export default {
 };
 </script>
 <style scoped>
-div{
-    font-family: 'Microsoft YaHei';
+div {
+  font-family: "Microsoft YaHei";
 }
 ul,
 li {
@@ -166,12 +173,15 @@ li {
 .header-center-li {
   cursor: pointer;
 }
+.header-center-li:hover {
+  font-weight: bold;
+}
 .container {
   text-align: center;
   margin: 0px auto;
   width: 980px;
   font-size: 26px;
-  color:#A6A6A6;
+  color: #a6a6a6;
 }
 .calendar-view {
   border-top: 1px #d1d1d1 solid;
@@ -190,7 +200,8 @@ li.top-li {
   height: 39px;
   line-height: 39px;
   background-color: #eaeaea;
-  color:#2B2B2B;
+  color: #2b2b2b;
+  font-size: 22px;
 }
 li.left-li {
   width: 138px;
@@ -199,11 +210,11 @@ li.left-li {
 .other-day {
   background: linear-gradient(
     45deg,
-    #F0F0F0 25%,
+    #f0f0f0 25%,
     #f7f7f7 0,
     #f7f7f7 50%,
-    #F0F0F0 0,
-    #F0F0F0 75%,
+    #f0f0f0 0,
+    #f0f0f0 75%,
     #f7f7f7 0
   );
   background-size: 30px 30px;
@@ -211,11 +222,29 @@ li.left-li {
 .current-day {
   background-color: #fdf5e6;
   font-weight: bold;
-  color:#2B2B2B;
+  color: #2b2b2b;
+}
+.select {
+  border: 2px solid #d1d1d1;
+  margin: 0px auto;
+  margin-top: 6.5px;
+  height: 82px;
+  line-height: 82px;
+  width: 122px;
+}
+.afterday {
+  background-color: #f7f7f7;
+  color: #2b2b2b;
+}
+.afterday:hover {
+  font-weight: bold;
 }
 .day {
   background-color: #f7f7f7;
-  color:#666666;
+  color: #666666;
+}
+.day:hover {
+  font-weight: bold;
 }
 .workday {
   width: 30px;
@@ -223,7 +252,7 @@ li.left-li {
   color: red;
   line-height: 30px;
   position: absolute;
-  font-weight:bold; 
+  font-weight: bold;
   font-size: 18px;
 }
 .holiday {
@@ -232,7 +261,25 @@ li.left-li {
   color: green;
   line-height: 30px;
   position: absolute;
-  font-weight:bold; 
+  font-weight: bold;
   font-size: 18px;
+}
+.task-view {
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  float: right;
+}
+.task-high-urgent{
+  border-top: 15px solid #EE3B3B;
+}
+.task-high-normal{
+  border-top: 15px solid #FFB90F;
+}
+.task-low-urgent{
+  border-top: 15px solid #4682B4;
+}
+.task-low-normal{
+  border-top: 15px solid #828282;
 }
 </style>
