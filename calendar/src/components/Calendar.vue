@@ -1,5 +1,6 @@
 <template>
   <div>
+    <StickyNotes></StickyNotes>
     <div class="header">
       <ul class="calendar-top">
         <li>
@@ -24,7 +25,10 @@
           <div>
             <div class="holiday" v-if="item.holiday !== null && item.holiday.holiday">休</div>
             <div class="workday" v-if="item.holiday !== null && !item.holiday.holiday">班</div>
-            <div class="task-view task-low-urgent" v-if="item.holiday !== null && item.holiday.holiday"></div>
+            <div
+              class="task-view task-low-urgent"
+              v-if="item.holiday !== null && item.holiday.holiday"
+            ></div>
             <!-- <div :class="item.select?'select':''">{{item.date}}</div> -->
             {{item.date}}
           </div>
@@ -35,7 +39,11 @@
 </template>
 <script>
 import utils from "../utils/calendar";
+import StickyNotes from "../components/StickyNotes";
 export default {
+  components: {
+    StickyNotes
+  },
   data() {
     return {
       selectDate: null,
@@ -270,16 +278,16 @@ li.left-li {
   border-left: 15px solid transparent;
   float: right;
 }
-.task-high-urgent{
-  border-top: 15px solid #EE3B3B;
+.task-high-urgent {
+  border-top: 15px solid #ee3b3b;
 }
-.task-high-normal{
-  border-top: 15px solid #FFB90F;
+.task-high-normal {
+  border-top: 15px solid #ffb90f;
 }
-.task-low-urgent{
-  border-top: 15px solid #4682B4;
+.task-low-urgent {
+  border-top: 15px solid #4682b4;
 }
-.task-low-normal{
+.task-low-normal {
   border-top: 15px solid #828282;
 }
 </style>
