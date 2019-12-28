@@ -1,6 +1,6 @@
 <template>
   <div>
-    <StickyNotes></StickyNotes>
+    <StickyNotes ref="StickyNotes"></StickyNotes>
     <div class="header">
       <ul class="calendar-top">
         <li>
@@ -21,7 +21,7 @@
         <li class="top-li">星期四</li>
         <li class="top-li">星期五</li>
         <li class="top-li">星期六</li>
-        <li v-for="(item,index) in weeksOfMonth" :key="index" :class="item.className">
+        <li v-for="(item,index) in weeksOfMonth" :key="index" :class="item.className" @click="showNote(item)">
           <div>
             <div class="holiday" v-if="item.holiday !== null && item.holiday.holiday">休</div>
             <div class="workday" v-if="item.holiday !== null && !item.holiday.holiday">班</div>
@@ -48,7 +48,8 @@ export default {
     return {
       selectDate: null,
       weeksOfMonth: [],
-      clickNum: 0
+      clickNum: 0,
+      divStatus: true
     };
   },
   methods: {
@@ -93,6 +94,10 @@ export default {
         v.holiday = res.data.holiday[v];
       });
       return list;
+    },
+    showNote: function(item) {
+      this.$refs.StickyNotes.closeWin(item);
+      // this.divStatus = !this.divStatus;
     }
   },
   watch: {
@@ -110,7 +115,7 @@ export default {
   }
 };
 </script>
-<style scoped>
+<style lang="less" scoped>
 div {
   font-family: "Microsoft YaHei";
 }
@@ -120,7 +125,6 @@ li {
   margin: 0;
   list-style: none;
 }
-
 .header {
   margin: 0px auto;
   width: 980px;

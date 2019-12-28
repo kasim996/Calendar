@@ -1,7 +1,7 @@
 <template>
-  <div class="container">
-    <div class="x-div clear">
-      <img :src="xUrl" />
+  <div class="container" v-show="divStatus">
+    <div class="x-div" @click="closeWin">
+      <img :src="xUrl"  />
     </div>
     <ul class="note-view">
       <li v-for="(item,i) in taskDatas" :key="i">
@@ -16,78 +16,8 @@
           <li class="note-li-level"></li>
         </ul>
       </li>
-      <!-- <li>
-        <ul class="note-ul clear">
-          <li class="note-li-num clear">一、</li>
-          <li class="note-li-content">
-            <textarea></textarea>
-          </li>
-          <li class="note-li-level"></li>
-        </ul>
-      </li>
-      <li>
-        <ul class="note-ul clear">
-          <li class="note-li-num clear">二、</li>
-          <li class="note-li-content">
-            <textarea></textarea>
-          </li>
-          <li class="note-li-level"></li>
-        </ul>
-      </li>
-      <li>
-        <ul class="note-ul clear">
-          <li class="note-li-num clear">三、</li>
-          <li class="note-li-content">
-            <textarea></textarea>
-          </li>
-          <li class="note-li-level"></li>
-        </ul>
-      </li>
-      <li>
-        <ul class="note-ul clear">
-          <li class="note-li-num clear">四、</li>
-          <li class="note-li-content">
-            <textarea></textarea>
-          </li>
-          <li class="note-li-level"></li>
-        </ul>
-      </li>
-      <li>
-        <ul class="note-ul clear">
-          <li class="note-li-num clear">五、</li>
-          <li class="note-li-content">
-            <textarea></textarea>
-          </li>
-          <li class="note-li-level"></li>
-        </ul>
-      </li>
-      <li>
-        <ul class="note-ul clear">
-          <li class="note-li-num clear">六、</li>
-          <li class="note-li-content">
-            <textarea></textarea>
-          </li>
-          <li class="note-li-level"></li>
-        </ul>
-      </li>
-      <li>
-        <ul class="note-ul clear">
-          <li class="note-li-num clear">七、</li>
-          <li class="note-li-content">
-            <textarea></textarea>
-          </li>
-          <li class="note-li-level"></li>
-        </ul>
-      </li>-->
     </ul>
     <ul class="note-task">
-      <!-- <li class="task-high-urgent"></li>
-      <li class="task-high-normal"></li>
-      <li class="task-high-normal"></li>
-      <li class="task-high-normal"></li>
-      <li class="task-low-urgent"></li>
-      <li class="task-low-urgent"></li>
-      <li class="task-low-normal"></li>-->
       <li
         v-for="(item,index) in taskStatusList"
         :class="item.taskLvl"
@@ -103,7 +33,8 @@ export default {
   data() {
     return {
       xUrl: x_icon,
-      taskDatas: []
+      taskDatas: [],
+      divStatus: false
     };
   },
   watch: {
@@ -165,6 +96,9 @@ export default {
         task.taskIndex
       ].taskStatus;
       this.$set(this.taskDatas, task.taskIndex, this.taskDatas[task.taskIndex]);
+    },
+    closeWin() {
+      this.divStatus = !this.divStatus;
     }
   },
   created: function() {
@@ -238,8 +172,8 @@ export default {
   font-family: "Microsoft YaHei";
   color: #2b2b2b;
 }
-.note-li-content-ok{
-  border-bottom: 1px solid #CDCDB4 !important;
+.note-li-content-ok {
+  border-bottom: 1px solid #cdcdb4 !important;
 }
 textarea::-webkit-scrollbar {
   width: 5px;
