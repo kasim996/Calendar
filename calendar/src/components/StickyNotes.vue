@@ -1,7 +1,7 @@
 <template>
   <div class="container" v-show="divStatus">
-    <div class="x-div" @click="closeWin">
-      <img :src="xUrl"  />
+    <div class="x-div" @click="showNote">
+      <img :src="xUrl" />
     </div>
     <ul class="note-view">
       <li v-for="(item,i) in taskDatas" :key="i">
@@ -17,6 +17,7 @@
         </ul>
       </li>
     </ul>
+    <div class="bottom-div">{{selectDay}}</div>
     <ul class="note-task">
       <li
         v-for="(item,index) in taskStatusList"
@@ -29,12 +30,17 @@
 </template>
 <script>
 import x_icon from "../assets/icon/x-icon.png";
+import localStore from "../utils/localStore";
+import task from "../components/model/task";
+// import notification from "../utils/notification";
+
 export default {
   data() {
     return {
       xUrl: x_icon,
       taskDatas: [],
-      divStatus: false
+      divStatus: false,
+      dailyItem: null
     };
   },
   watch: {
@@ -43,23 +49,21 @@ export default {
         newValue.forEach(function(v) {
           v.taskStatus = v.taskValue == "" ? null : v.taskStatus ? true : false;
         });
+        localStore.saveItem(this.dailyItem.toString(), newValue);
         return newValue;
       },
       deep: true
+    },
+    divStatus: function(newVaule) {
+      if (!newVaule) {
+        this.$emit("flushNoteStatus");
+      }
     }
   },
   computed: {
     taskStatusList: function() {
       let arr = [];
-      let taskLvls = [
-        "task-high-urgent",
-        "task-high-normal",
-        "task-high-normal",
-        "task-high-normal",
-        "task-low-urgent",
-        "task-low-urgent",
-        "task-low-normal"
-      ];
+      let taskLvls = task.getTaskLvls();
       this.taskDatas.forEach(function(v, i) {
         if (v.taskStatus === true) {
           arr.push({
@@ -75,34 +79,36 @@ export default {
         }
       });
       return arr;
+    },
+    selectDay: function() {
+      if (this.dailyItem) {
+        return this.dailyItem.toCNDate();
+      } else {
+        return "";
+      }
     }
   },
   methods: {
-    initTasks: function() {
-      let taskDatas = [];
-      let nums = ["一、", "二、", "三、", "四、", "五、", "六、", "七、"];
-      nums.forEach(function(v, i) {
-        taskDatas.push({
-          taskIndex: i,
-          taskNum: v,
-          taskValue: "",
-          taskStatus: null
-        });
-      });
+    initTasks: function(item) {
+      let taskDatas =
+        localStore.getItem(item.toString()) || task.getInitTaskDatas();
       return taskDatas;
     },
     finishTask(task) {
-      this.taskDatas[task.taskIndex].taskStatus = !this.taskDatas[
-        task.taskIndex
-      ].taskStatus;
-      this.$set(this.taskDatas, task.taskIndex, this.taskDatas[task.taskIndex]);
+      let taskData = this.taskDatas[task.taskIndex];
+      taskData.taskStatus = !taskData.taskStatus;
+      this.$set(this.taskDatas, task.taskIndex, taskData);
     },
-    closeWin() {
+    showNote(item) {
+      if (item.year) {
+        this.dailyItem = item;
+        this.taskDatas = this.initTasks(item);
+      }
       this.divStatus = !this.divStatus;
     }
   },
   created: function() {
-    this.taskDatas = this.initTasks();
+    // this.taskDatas = this.initTasks();
   }
 };
 </script>
@@ -110,30 +116,35 @@ export default {
 .container {
   width: 980px;
   height: 610px;
-  margin: 0;
-  padding: 0;
   background-color: #fdf5e6;
-  /* margin: 0 auto; */
   position: absolute;
   left: calc(~"50% - 490px");
   z-index: 999;
+}
+.bottom-div {
+  float: right;
+  height: 35px;
+  width: 900px;
+  line-height: 35px;
+  text-align: right;
+  margin-right: 30px;
+  margin-top: 30px;
+  font-size: 20px;
+  color: #2b2b2b;
 }
 .x-div {
   float: right;
   margin-right: 10px;
 }
 .note-view {
-  padding: 0;
-  margin: 70px 0px 0px 0px;
+  margin: 45px 0px 0px 0px;
   list-style: none;
 }
 .note-view > li {
   height: 70px;
   line-height: 70px;
-  // border: 1px solid red;
 }
 .note-ul {
-  padding: 0;
   margin: 0 auto;
   list-style: none;
   width: 900px;
@@ -143,11 +154,8 @@ export default {
   height: 100%;
   font-size: 25px;
   float: left;
-  padding: 0px;
-  margin: 0px;
   line-height: 40px;
-  font-family: "Microsoft YaHei";
-  color: #2b2b2b;
+  color: #666666;
 }
 .note-li-num {
   width: 50px;
@@ -159,18 +167,14 @@ export default {
 .note-li-content > textarea {
   width: 100%;
   height: 64px;
-  // border: 0;
-  border-top: none;
-  border-left: none;
-  border-right: none;
+  border: none;
   border-bottom: 1px solid #ededed;
   background-color: #fdf5e6;
   margin-top: 1px;
   resize: none;
   outline: none;
   font-size: 25px;
-  font-family: "Microsoft YaHei";
-  color: #2b2b2b;
+  color: #666666;
 }
 .note-li-content-ok {
   border-bottom: 1px solid #cdcdb4 !important;
@@ -195,38 +199,28 @@ textarea::-webkit-scrollbar-track {
   height: 80%;
 }
 .note-task {
-  margin-top: 45px;
+  margin-top: 70px;
   margin-bottom: 0px;
-  padding: 0;
-  // float: right;
   list-style: none;
   width: 100%;
   height: 5px;
 }
 .note-task > li {
-  // float: right;
   width: 40px;
   border: none;
   height: 100%;
   cursor: pointer;
 }
 .task-high-urgent {
-  // border-left: 10px solid #ee3b3b;
-  // float: left;
   background-color: #ee3b3b;
 }
 .task-high-normal {
-  // float: right;
-  // border-top: 15px solid #ffb90f;
   background-color: #ffb90f;
 }
 .task-low-urgent {
-  // float: right;
-  // border-top: 15px solid #4682b4;
   background-color: #4682b4;
 }
 .task-low-normal {
-  // border-top: 15px solid #828282;
   background-color: #828282;
 }
 .task-finish {

@@ -10,10 +10,13 @@ export default {
             date,
             day,
             toString() {
-                return `${year}-${month+1}-${date}`;
+                return `${year}-${month + 1}-${date}`;
             },
-            toYearMonth(){
-                return `${year}年${month+1}月`;
+            toYearMonth() {
+                return `${year}年${month + 1}月`;
+            },
+            toCNDate() {
+                return `${year}年${month + 1}月${date}日`;
             }
         }
     },
@@ -45,7 +48,7 @@ export default {
         }
         return arr;
     },
-    getDaysOfMonth:function(d){
+    getDaysOfMonth: function (d) {
         let ymd = this.getYMD(d);
         let startDate = new Date(ymd.year, ymd.month, 1);
         let endDate = new Date(ymd.year, ymd.month + 1, 0);

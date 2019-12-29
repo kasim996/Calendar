@@ -1,6 +1,6 @@
 <template>
   <div>
-    <StickyNotes ref="StickyNotes"></StickyNotes>
+    <StickyNotes ref="StickyNotes" @flushNoteStatus="flushNoteStatus"></StickyNotes>
     <div class="header">
       <ul class="calendar-top">
         <li>
@@ -21,15 +21,19 @@
         <li class="top-li">星期四</li>
         <li class="top-li">星期五</li>
         <li class="top-li">星期六</li>
-        <li v-for="(item,index) in weeksOfMonth" :key="index" :class="item.className" @click="showNote(item)">
+        <li
+          v-for="(item,index) in weeksOfMonth"
+          :key="index"
+          :class="item.className"
+          @click="showNote(item)"
+        >
+          <div
+            :class="['task-view', item.dailyStatus.dailyClass]"
+            v-if="item.dailyStatus.taskStatus !== ''"
+          ></div>
           <div>
             <div class="holiday" v-if="item.holiday !== null && item.holiday.holiday">休</div>
             <div class="workday" v-if="item.holiday !== null && !item.holiday.holiday">班</div>
-            <div
-              class="task-view task-low-urgent"
-              v-if="item.holiday !== null && item.holiday.holiday"
-            ></div>
-            <!-- <div :class="item.select?'select':''">{{item.date}}</div> -->
             {{item.date}}
           </div>
         </li>
@@ -40,6 +44,10 @@
 <script>
 import utils from "../utils/calendar";
 import StickyNotes from "../components/StickyNotes";
+import task from "../components/model/task";
+import localStore from "../utils/localStore";
+import notification from "../utils/notification";
+
 export default {
   components: {
     StickyNotes
@@ -49,7 +57,8 @@ export default {
       selectDate: null,
       weeksOfMonth: [],
       clickNum: 0,
-      divStatus: true
+      divStatus: true,
+      selectItem:null
     };
   },
   methods: {
@@ -61,6 +70,22 @@ export default {
     resetMonth: function() {
       this.selectDate = new Date();
       this.clickNum = 0;
+    },
+    getHoliday: async function(d) {
+      let res = null;
+      try {
+        res = await this.$axios({
+          method: "get",
+          url: "http://timor.tech/api/holiday/batch?d=" + d
+        });
+      } catch (err) {
+        res = {
+          data: {
+            holiday: []
+          }
+        };
+      }
+      return res;
     },
     getWeeksOfMonth: async function(d) {
       let ymd = utils.getYMD(new Date());
@@ -86,18 +111,35 @@ export default {
         v.className = className;
         dates += v.toString() + ",";
       });
-      let res = await this.$axios({
-        method: "get",
-        url: "http://timor.tech/api/holiday/batch?d=" + dates
-      });
+      let res = await this.getHoliday(dates);
       list.forEach(function(v) {
-        v.holiday = res.data.holiday[v];
+        v.holiday = res.data.holiday ? res.data.holiday[v] : null;
+        v.dailyStatus = task.getDailyStatus(localStore.getItem(v.toString()));
       });
       return list;
     },
+    flushNoteStatus: function() {
+      this.weeksOfMonth.forEach(function(v) {
+        v.dailyStatus = task.getDailyStatus(localStore.getItem(v.toString()));
+      });
+
+      if (this.selectItem.select) {
+          if (this.selectItem.dailyStatus.taskStatus === true) {
+            notification.showMsgNotification(
+              this.selectItem.toString(),
+              `您今日任务已全部完成！`
+            );
+          } else if (this.selectItem.dailyStatus.taskStatus === false) {
+            notification.showMsgNotification(
+              this.selectItem.toString(),
+              `您今日还有"${task.getTaskLvlCN(this.selectItem.dailyStatus.dailyClass)}"任务尚未完成！`
+            );
+          }
+        }
+    },
     showNote: function(item) {
-      this.$refs.StickyNotes.closeWin(item);
-      // this.divStatus = !this.divStatus;
+      this.selectItem = item;
+      this.$refs.StickyNotes.showNote(item);
     }
   },
   watch: {
@@ -116,15 +158,6 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-div {
-  font-family: "Microsoft YaHei";
-}
-ul,
-li {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
 .header {
   margin: 0px auto;
   width: 980px;
@@ -134,16 +167,13 @@ li {
   width: 450px;
   height: 60px;
   margin: 0 auto;
-
   border: none;
 }
 .calendar-top > li {
   width: 150px;
   height: 60px;
   line-height: 60px;
-  margin: 0;
   float: left;
-  /* border-top: 1px #d1d1d1 solid; */
   font-size: 24px;
 }
 .arrow-left {
@@ -203,10 +233,10 @@ li {
   width: 139px;
   height: 99px;
   line-height: 99px;
-  margin: 0;
   float: left;
   border-bottom: 1px #d1d1d1 solid;
   border-right: 1px #d1d1d1 solid;
+  position: relative;
 }
 li.top-li {
   height: 39px;
@@ -280,7 +310,8 @@ li.left-li {
   width: 0;
   height: 0;
   border-left: 15px solid transparent;
-  float: right;
+  position: absolute;
+  right: 0px;
 }
 .task-high-urgent {
   border-top: 15px solid #ee3b3b;
@@ -293,5 +324,8 @@ li.left-li {
 }
 .task-low-normal {
   border-top: 15px solid #828282;
+}
+.task-ok {
+  border-top: 15px solid green;
 }
 </style>
