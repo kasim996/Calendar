@@ -30,7 +30,9 @@
           <div
             :class="['task-view', item.dailyStatus.dailyClass]"
             v-if="item.dailyStatus.taskStatus !== ''"
-          ></div>
+          >
+            <img :src="crown_icon" v-if="item.dailyStatus.taskStatus" />
+          </div>
           <div>
             <div class="holiday" v-if="item.holiday !== null && item.holiday.holiday">休</div>
             <div class="workday" v-if="item.holiday !== null && !item.holiday.holiday">班</div>
@@ -47,6 +49,7 @@ import StickyNotes from "../components/StickyNotes";
 import task from "../components/model/task";
 import localStore from "../utils/localStore";
 import notification from "../utils/notification";
+import crown_icon from "../assets/icon/crown.png";
 
 export default {
   components: {
@@ -58,7 +61,8 @@ export default {
       weeksOfMonth: [],
       clickNum: 0,
       divStatus: true,
-      selectItem:null
+      selectItem: null,
+      crown_icon
     };
   },
   methods: {
@@ -124,18 +128,20 @@ export default {
       });
 
       if (this.selectItem.select) {
-          if (this.selectItem.dailyStatus.taskStatus === true) {
-            notification.showMsgNotification(
-              this.selectItem.toString(),
-              `您今日任务已全部完成！`
-            );
-          } else if (this.selectItem.dailyStatus.taskStatus === false) {
-            notification.showMsgNotification(
-              this.selectItem.toString(),
-              `您今日还有"${task.getTaskLvlCN(this.selectItem.dailyStatus.dailyClass)}"任务尚未完成！`
-            );
-          }
+        if (this.selectItem.dailyStatus.taskStatus === true) {
+          notification.showMsgNotification(
+            this.selectItem.toString(),
+            `您今日任务已全部完成！`
+          );
+        } else if (this.selectItem.dailyStatus.taskStatus === false) {
+          notification.showMsgNotification(
+            this.selectItem.toString(),
+            `您今日还有"${task.getTaskLvlCN(
+              this.selectItem.dailyStatus.dailyClass
+            )}"任务尚未完成！`
+          );
         }
+      }
     },
     showNote: function(item) {
       this.selectItem = item;
@@ -326,6 +332,9 @@ li.left-li {
   border-top: 15px solid #828282;
 }
 .task-ok {
-  border-top: 15px solid green;
+  width: 30px;
+  height: 30px;
+  line-height: 0;
+  text-align: right;
 }
 </style>
