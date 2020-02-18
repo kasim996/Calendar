@@ -6,5 +6,8 @@ export default {
     },
     saveItem(key, value) {
         localStore.setItem(key, JSON.stringify(value));
+    },
+    removeItem(key) {
+        localStore.removeItem(key);
     }
 }

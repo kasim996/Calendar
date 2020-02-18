@@ -116,7 +116,7 @@ export default {
 .container {
   width: 980px;
   height: 610px;
-  background-color: #fdf5e6;
+  background-color: #EEDFCC;
   position: absolute;
   left: calc(~"50% - 490px");
   z-index: 999;
@@ -169,7 +169,7 @@ export default {
   height: 64px;
   border: none;
   border-bottom: 1px solid #ededed;
-  background-color: #fdf5e6;
+  background-color: #EEDFCC;
   margin-top: 1px;
   resize: none;
   outline: none;

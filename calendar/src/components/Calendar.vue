@@ -85,7 +85,7 @@ export default {
       } catch (err) {
         res = {
           data: {
-            holiday: []
+            holiday: null
           }
         };
       }
@@ -160,6 +160,39 @@ export default {
   },
   created: function() {
     this.selectDate = new Date();
+    let self = this;
+    let time = (function() {
+      // return 20000;
+      return (
+        utils.getAddDate(self.selectDate, 1).getTime() -
+        self.selectDate.getTime() +
+        2 * 60 * 60 * 1000
+      );
+    })();
+    let fulshStore = function() {
+      let lastDay = utils.getYMD(utils.getAddDate(new Date(), -1));
+      let currentDay = utils.getYMD(new Date());
+      let lastItem = localStore.getItem(lastDay.toString()) || [];
+      let currentItem = localStore.getItem(currentDay.toString()) || task.getInitTaskDatas();
+      lastItem.forEach(function(v, i) {
+        if (v.taskStatus === false) {
+          currentItem[i].taskValue += "\r\n" + v.taskValue;
+          currentItem[i].taskStatus = false;
+          v.taskValue = null;
+          v.taskStatus = null;
+        }
+      });
+      localStore.saveItem(lastDay.toString(), lastItem);
+      localStore.saveItem(currentDay.toString(), currentItem);
+    };
+    let timer = () => {
+      setTimeout(function() {
+        fulshStore();
+        self.resetMonth();
+        timer();
+      }, time);
+    };
+    timer();
   }
 };
 </script>
